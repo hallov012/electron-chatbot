@@ -27,3 +27,22 @@
  *   }
  * }
  */
+
+import { contextBridge, ipcRenderer } from 'electron';
+
+const validChannels = ['updater-message']
+
+contextBridge.exposeInMainWorld('electron', {
+  ipcRenderer: {
+    send: (channel: string, data: any) => {
+      if (validChannels.includes(channel)) {
+        ipcRenderer.send(channel, data);
+      }
+    },
+    receive: (channel: string, func: (data: any) => void) => {
+      if (validChannels.includes(channel)) {
+        ipcRenderer.on(channel, (event, data) => func(data));
+      }
+    },
+  },
+});

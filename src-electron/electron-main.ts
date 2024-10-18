@@ -71,6 +71,7 @@ function createWindow() {
 
   autoUpdater.on('update-downloaded', (event) => {
     log.info('Update downloaded:', event);
+    autoUpdater.quitAndInstall();
     mainWindow?.webContents.send(
       'updater-message',
       'Update downloaded. Ready to install.'
