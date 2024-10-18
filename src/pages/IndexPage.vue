@@ -1,6 +1,8 @@
 <template>
   <q-page class="row items-center justify-evenly">
-    0.0.4
+    0.0.7
+    <QBtn @click="alertClick">Alert</QBtn>
+    <QBtn @click="confirmClick">Confirm</QBtn>
     <example-component
       title="Example component"
       active
@@ -18,6 +20,19 @@ import ExampleComponent from 'components/ExampleComponent.vue';
 defineOptions({
   name: 'IndexPage',
 });
+
+const alertClick = () => {
+  alert('Hello, Quasar!');
+};
+
+const confirmClick = () => {
+  const result = confirm('Are you sure?');
+  if (result) {
+    alert('You clicked OK!');
+  } else {
+    alert('You clicked Cancel!');
+  }
+};
 
 const todos = ref<Todo[]>([
   {

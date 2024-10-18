@@ -7,3 +7,13 @@
 //  this declaration also apply `quasar` own
 //  augmentations (eg. adds `$q` into Vue component context)
 /// <reference types="@quasar/app-vite" />
+
+
+interface Window {
+  electron: {
+    ipcRenderer: {
+      send(channel: string, data?: string): void;
+      receive(channel: string, func: (data: string) => void): void;
+    };
+  };
+}

@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import path from 'path';
@@ -6,6 +6,7 @@ import os from 'os';
 
 log.transports.file.level = 'info';
 autoUpdater.logger = log;
+autoUpdater.autoDownload = true;
 
 // needed in case process is undefined under Linux
 const platform = process.platform || os.platform();
@@ -60,23 +61,23 @@ function createWindow() {
     log.info('Update available.');
     mainWindow?.webContents.send(
       'updater-message',
-      'A new update is available.'
+      'A new update is available. Downloading now...'
     );
   });
 
   autoUpdater.on('update-not-available', () => {
     log.info('Update not available.');
-    mainWindow?.webContents.send('updater-message', 'Update not available.');
+    // mainWindow?.webContents.send('updater-message', 'Update not available.');
   });
 
   autoUpdater.on('update-downloaded', (event) => {
     log.info('Update downloaded:', event);
-    autoUpdater.quitAndInstall();
-    mainWindow?.webContents.send(
-      'updater-message',
-      'Update downloaded. Ready to install.'
-    );
+    mainWindow?.webContents.send('updater-message', 'Update has been downloaded. You can install it now.');
   });
+
+  ipcMain.on('install-update', () => {
+    autoUpdater.quitAndInstall();
+  })
 }
 
 app.whenReady().then(createWindow);
