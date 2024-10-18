@@ -1,6 +1,6 @@
 <template>
   <q-page class="row items-center justify-evenly">
-    0.0.3
+    0.0.4
     <example-component
       title="Example component"
       active
