@@ -1,48 +1,56 @@
 <template>
-  <q-page class="row items-center justify-evenly">
-    0.0.4
-    <example-component
-      title="Example component"
-      active
-      :todos="todos"
-      :meta="meta"
-    ></example-component>
-  </q-page>
+  <q-layout view="lHh Lpr lFf">
+    <q-page-container>
+      <q-page class="column items-center justify-center">
+        <div class="iw-header">Version 0.0.4</div>
+        <div class="iw-logo-wrap column items-center q-mb-lg">
+          <q-icon
+            name="chat"
+            size="10em"
+            color="primary"
+            class="iw-logo-icon q-mb-xs"
+          />
+          <span class="iw-logo-text">INNO Chat</span>
+        </div>
+
+        <q-btn
+          color="primary"
+          label="Start Chatting"
+          outline
+          @click="() => $router.push('/chat')"
+        />
+      </q-page>
+    </q-page-container>
+  </q-layout>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { Todo, Meta } from 'components/models';
-import ExampleComponent from 'components/ExampleComponent.vue';
-
 defineOptions({
   name: 'IndexPage',
 });
-
-const todos = ref<Todo[]>([
-  {
-    id: 1,
-    content: 'ct1',
-  },
-  {
-    id: 2,
-    content: 'ct2',
-  },
-  {
-    id: 3,
-    content: 'ct3',
-  },
-  {
-    id: 4,
-    content: 'ct4',
-  },
-  {
-    id: 5,
-    content: 'ct5',
-  },
-]);
-
-const meta = ref<Meta>({
-  totalCount: 1200,
-});
 </script>
+
+<style lang="scss" scoped>
+.iw-header {
+  position: fixed;
+  top: 4px;
+  right: 4px;
+  color: $secondary;
+}
+
+.iw-logo-icon {
+  background: linear-gradient(to right, $primary, $secondary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.iw-logo-text {
+  font-size: 2.5em;
+  font-weight: 700;
+  text-align: center;
+  margin: 0;
+  background: linear-gradient(to right, $primary, $secondary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+</style>
