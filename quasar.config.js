@@ -205,7 +205,7 @@ module.exports = configure(function (/* ctx */) {
           allowToChangeInstallationDirectory: true,
           createDesktopShortcut: true,     // 바탕화면 바로가기
           createStartMenuShortcut: true,   // 시작 메뉴 바로가기
-          shortcutName: "electron chatbot"    // 바로가기 이름
+          shortcutName: 'electron chatbot'    // 바로가기 이름
         }
       },
     },
