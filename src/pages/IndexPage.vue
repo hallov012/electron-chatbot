@@ -2,7 +2,7 @@
   <q-layout view="lHh Lpr lFf">
     <q-page-container>
       <q-page class="column items-center justify-center">
-        <div class="iw-header">Version 0.0.4</div>
+        <div class="iw-header">Version 0.0.7</div>
         <div class="iw-logo-wrap column items-center q-mb-lg">
           <q-icon
             name="chat"

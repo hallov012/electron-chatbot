@@ -30,11 +30,11 @@
 
 import { contextBridge, ipcRenderer } from 'electron';
 
-const validChannels = ['updater-message'];
+const validChannels = ['updater-message', 'install-update']
 
 contextBridge.exposeInMainWorld('electron', {
   ipcRenderer: {
-    send: (channel: string, data: string) => {
+    send: (channel: string, data?: string) => {
       if (validChannels.includes(channel)) {
         ipcRenderer.send(channel, data);
       }
