@@ -1,106 +1,90 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
-      <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        />
+    <q-layout view="lHh Lpr lFf" class="iw-layout">
+        <q-list class="iw-list-wrap">
+            <q-item-label header> INNO Chat </q-item-label>
+            <q-item
+                v-ripple
+                v-for="tab in tabList"
+                clickable
+                :key="tab.title"
+                class="iw-list-item"
+                @click="$router.push(`/chat/${tab.path}`)"
+            >
+                <q-avatar
+                    color="primary"
+                    text-color="white"
+                    :icon="tab.icon"
+                    size="md"
+                />
+                <q-item-section class="iw-item-title">{{
+                    tab.title
+                }}</q-item-section>
+            </q-item>
+        </q-list>
 
-        <q-toolbar-title>
-          Quasar App
-        </q-toolbar-title>
-
-        <div>Quasar v{{ $q.version }}</div>
-      </q-toolbar>
-    </q-header>
-
-    <q-drawer
-      v-model="leftDrawerOpen"
-      show-if-above
-      bordered
-    >
-      <q-list>
-        <q-item-label
-          header
-        >
-          Essential Links
-        </q-item-label>
-
-        <EssentialLink
-          v-for="link in linksList"
-          :key="link.title"
-          v-bind="link"
-        />
-      </q-list>
-    </q-drawer>
-
-    <q-page-container>
-      <router-view />
-    </q-page-container>
-  </q-layout>
+        <q-page-container class="iw-page-container">
+            <router-view />
+        </q-page-container>
+    </q-layout>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import EssentialLink, { EssentialLinkProps } from 'components/EssentialLink.vue';
+import { useRoute } from 'vue-router';
+import { computed } from 'vue';
 
 defineOptions({
-  name: 'MainLayout'
+    name: 'MainLayout',
 });
 
-const linksList: EssentialLinkProps[] = [
-  {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev'
-  },
-  {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework'
-  },
-  {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev'
-  },
-  {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev'
-  },
-  {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev'
-  },
-  {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev'
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev'
-  }
+interface Tab {
+    title: string;
+    path: string;
+    icon: string;
+}
+
+const tabList: Tab[] = [
+    {
+        title: 'Chat GPT-3',
+        icon: 'school',
+        path: '/chat',
+    },
+    {
+        title: 'XCAP Cloud',
+        icon: 'cloud',
+        path: '/xcap',
+    },
 ];
 
-const leftDrawerOpen = ref(false);
-
-function toggleLeftDrawer () {
-  leftDrawerOpen.value = !leftDrawerOpen.value;
-}
+const route = useRoute();
+const path = computed(() => route.path);
+console.log('path', path);
 </script>
+
+<style lang="scss" scoped>
+.iw-layout {
+    height: 100vh;
+    display: flex;
+
+    .iw-list-wrap {
+        height: 100%;
+        min-width: 250px;
+        max-width: 350px;
+        width: 20vw;
+        border-right: 1px solid $grey-4;
+
+        .iw-list-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            .iw-item-title {
+                font-size: 1em;
+            }
+        }
+    }
+
+    .iw-page-container {
+        flex: 1;
+    }
+}
+</style>
