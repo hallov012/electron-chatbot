@@ -9,7 +9,11 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/chat',
     component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/ChatPage.vue') }],
+    redirect: '/chat/gpt',
+    children: [
+      { path: 'gpt', component: () => import('pages/ChatPage.vue') },
+      { path: 'xcap', component: () => import('pages/ChatPage.vue') }
+    ],
   },
   // Always leave this as last one,
   // but you can also remove it
