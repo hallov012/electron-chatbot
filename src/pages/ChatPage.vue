@@ -2,15 +2,18 @@
     <q-page class="iw-chat-page">
         <q-scroll-area class="iw-message-wrap">
             <q-chat-message
+                class="iw-chat-message"
                 v-for="(message, idx) in messageList"
                 :key="idx"
                 :name="message.isUser ? 'Me' : message.name"
                 :text="message.text"
                 :sent="message.isUser"
+                text-html
                 :stamp="dateToStamp(message.timestamp)"
                 :bg-color="message.isUser ? undefined : 'primary'"
                 :text-color="message.isUser ? undefined : 'white'"
-            />
+            >
+            </q-chat-message>
         </q-scroll-area>
         <div class="iw-message-input-wrap">
             <q-input
@@ -26,13 +29,16 @@
 </template>
 
 <script setup lang="ts">
-import {computed, ref} from 'vue';
+import { ref } from 'vue';
 import { callGpt } from 'src/api/gpt';
-import {useRoute} from 'vue-router';
 
 defineOptions({
     name: 'ChatPage',
 });
+
+const props = defineProps<{
+    pageKey: string;
+}>();
 
 interface Message {
     text: string[];
@@ -40,11 +46,6 @@ interface Message {
     name?: string;
     timestamp: Date;
 }
-
-const route = useRoute();
-const currentPath = computed(() => {
-  return route.path.split('/')[2];
-});
 
 const messageList = ref<Message[]>([]);
 const message = ref<string>('');
@@ -57,9 +58,9 @@ const sendMessage = async () => {
             timestamp: new Date(),
         });
 
-        if (currentPath.value === 'gpt') {
+        if (props.pageKey === 'gpt') {
             await sendMessageToGpt();
-        } else if (currentPath.value === 'xcap') {
+        } else if (props.pageKey === 'xcap') {
             await sendMessageToXcap();
         }
 
@@ -68,46 +69,51 @@ const sendMessage = async () => {
 };
 
 const sendMessageToGpt = async () => {
-  const response = await callGpt(message.value);
-  if (response.success) {
-    messageList.value.push({
-      name: 'Chat GPT-3',
-      text: response.data.split('\n'),
-      isUser: false,
-      timestamp: new Date(),
-    });
+    const response = await callGpt(message.value);
+    if (response.success) {
+        messageList.value.push({
+            name: 'Chat GPT-3',
+            text: [`<span>${response.data}</span>`],
+            isUser: false,
+            timestamp: new Date(),
+        });
 
-    window.electron.ipcRenderer.send('chat-message', {
-      message: response.data,
-      author: 'Chat GPT-3',
-    });
-  }
-}
+        window.electron.ipcRenderer.send('chat-message', {
+            message: response.data,
+            author: 'Chat GPT-3',
+        });
+    }
+};
 
 const sendMessageToXcap = async () => {
-  const widgetData = {
-    period: {
-      start: '20160101090000',
-      end: '20240830085900',
-    },
-    data: {
-      widgetType: 'Graph',
-      aggr: 'sum',
-      cdrDbTableName: 'voicecall_statistics',
-      dbColumnName: 'common_success_cnt',
-      columnName: '기본 SUCCESS CNT',
-      chartTypeId: 'line_1'
-    }
-  }
+    const widgetData = {
+        period: {
+            start: '20160101090000',
+            end: '20240830085900',
+        },
+        data: {
+            widgetType: 'Graph',
+            aggr: 'sum',
+            cdrDbTableName: 'voicecall_statistics',
+            dbColumnName: 'common_success_cnt',
+            columnName: '기본 SUCCESS CNT',
+            chartTypeId: 'line_1',
+        },
+    };
 
-  const url = import.meta.env.VITE_XCAP_URL + '?widgetData=' + JSON.stringify(widgetData);
-  messageList.value.push({
-    name: 'XCAP Cloud',
-    text: [url],
-    isUser: false,
-    timestamp: new Date(),
-  });
-}
+    const url =
+        import.meta.env.VITE_XCAP_CLOUD_URL +
+        '?widgetData=' +
+        JSON.stringify(widgetData);
+    messageList.value.push({
+        name: 'XCAP Cloud',
+        text: [
+            `<a class="iw-link" href="${url}" target="_blank">Click here to view the XCAP Cloud</a>`,
+        ],
+        isUser: false,
+        timestamp: new Date(),
+    });
+};
 
 const dateToStamp = (date: Date) => {
     const hours = date.getHours();
@@ -129,6 +135,15 @@ const dateToStamp = (date: Date) => {
         width: 100%;
         padding: 1rem;
         flex: 1;
+
+        .iw-chat-message {
+            margin-bottom: 1rem;
+
+            ::v-deep a {
+                color: white;
+                text-decoration: underline;
+            }
+        }
     }
 
     .iw-message-input-wrap {
