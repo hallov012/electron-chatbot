@@ -27,7 +27,7 @@
  *   }
  * }
  */
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { contextBridge, ipcRenderer } from 'electron';
 
 const validChannels = ['updater-message', 'install-update', 'chat-message'];

@@ -26,8 +26,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import {computed, ref} from 'vue';
 import { callGpt } from 'src/api/gpt';
+import {useRoute} from 'vue-router';
 
 defineOptions({
     name: 'ChatPage',
@@ -40,6 +41,11 @@ interface Message {
     timestamp: Date;
 }
 
+const route = useRoute();
+const currentPath = computed(() => {
+  return route.path.split('/')[2];
+});
+
 const messageList = ref<Message[]>([]);
 const message = ref<string>('');
 
@@ -51,24 +57,57 @@ const sendMessage = async () => {
             timestamp: new Date(),
         });
 
-        const response = await callGpt(message.value);
-        if (response.success) {
-            messageList.value.push({
-                name: 'Chat GPT-3',
-                text: response.data.split('\n'),
-                isUser: false,
-                timestamp: new Date(),
-            });
-
-            window.electron.ipcRenderer.send('chat-message', {
-                message: response.data,
-                author: 'Chat GPT-3',
-            });
+        if (currentPath.value === 'gpt') {
+            await sendMessageToGpt();
+        } else if (currentPath.value === 'xcap') {
+            await sendMessageToXcap();
         }
 
         message.value = '';
     }
 };
+
+const sendMessageToGpt = async () => {
+  const response = await callGpt(message.value);
+  if (response.success) {
+    messageList.value.push({
+      name: 'Chat GPT-3',
+      text: response.data.split('\n'),
+      isUser: false,
+      timestamp: new Date(),
+    });
+
+    window.electron.ipcRenderer.send('chat-message', {
+      message: response.data,
+      author: 'Chat GPT-3',
+    });
+  }
+}
+
+const sendMessageToXcap = async () => {
+  const widgetData = {
+    period: {
+      start: '20160101090000',
+      end: '20240830085900',
+    },
+    data: {
+      widgetType: 'Graph',
+      aggr: 'sum',
+      cdrDbTableName: 'voicecall_statistics',
+      dbColumnName: 'common_success_cnt',
+      columnName: '기본 SUCCESS CNT',
+      chartTypeId: 'line_1'
+    }
+  }
+
+  const url = import.meta.env.VITE_XCAP_URL + '?widgetData=' + JSON.stringify(widgetData);
+  messageList.value.push({
+    name: 'XCAP Cloud',
+    text: [url],
+    isUser: false,
+    timestamp: new Date(),
+  });
+}
 
 const dateToStamp = (date: Date) => {
     const hours = date.getHours();

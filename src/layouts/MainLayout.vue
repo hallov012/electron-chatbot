@@ -4,6 +4,7 @@
             <q-item-label header> INNO Chat </q-item-label>
             <q-item
                 v-ripple
+                :active="currentPath === tab.path"
                 v-for="tab in tabList"
                 clickable
                 :key="tab.title"
@@ -46,18 +47,19 @@ const tabList: Tab[] = [
     {
         title: 'Chat GPT-3',
         icon: 'school',
-        path: '/chat',
+        path: 'gpt',
     },
     {
         title: 'XCAP Cloud',
         icon: 'cloud',
-        path: '/xcap',
+        path: 'xcap',
     },
 ];
 
 const route = useRoute();
-const path = computed(() => route.path);
-console.log('path', path);
+const currentPath = computed(() => {
+  return route.path.split('/')[2];
+});
 </script>
 
 <style lang="scss" scoped>
