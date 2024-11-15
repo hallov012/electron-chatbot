@@ -1,19 +1,25 @@
 <template>
     <q-page class="iw-chat-page">
         <q-scroll-area class="iw-message-wrap">
-            <q-chat-message
-                class="iw-chat-message"
-                v-for="(message, idx) in messageList"
-                :key="idx"
-                :name="message.isUser ? 'Me' : message.name"
-                :text="message.text"
-                :sent="message.isUser"
-                text-html
-                :stamp="dateToStamp(message.timestamp)"
-                :bg-color="message.isUser ? undefined : 'primary'"
-                :text-color="message.isUser ? undefined : 'white'"
-            >
-            </q-chat-message>
+<!--            <q-chat-message-->
+<!--                class="iw-chat-message"-->
+<!--                v-for="(message, idx) in messageList"-->
+<!--                :key="idx"-->
+<!--                :name="message.isUser ? 'Me' : message.name"-->
+<!--                :text="message.text"-->
+<!--                :sent="message.isUser"-->
+<!--                text-html-->
+<!--                :stamp="dateToStamp(message.timestamp)"-->
+<!--                :bg-color="message.isUser ? undefined : 'primary'"-->
+<!--                :text-color="message.isUser ? undefined : 'white'"-->
+<!--            >-->
+<!--            </q-chat-message>-->
+          <div class="iw-chat-message" v-for="(message, idx) in messageList" :key="idx">
+            <div class="iw-name">{{message.isUser ? 'Me' : message.name}}</div>
+            <div class="iw-text" v-if="message.text">{{message.text}}</div>
+            <a class="iw-link" v-if="message.link" :href="message.link">Click And Move To XCAP-Cloud</a>
+            <div class="iw-timestamp">{{dateToStamp(message.timestamp)}}</div>
+          </div>
         </q-scroll-area>
         <div class="iw-message-input-wrap">
             <q-input
@@ -41,7 +47,8 @@ const props = defineProps<{
 }>();
 
 interface Message {
-    text: string[];
+    text?: string;
+    link?: string;
     isUser: boolean;
     name?: string;
     timestamp: Date;
@@ -53,7 +60,7 @@ const message = ref<string>('');
 const sendMessage = async () => {
     if (message.value) {
         messageList.value.push({
-            text: message.value.split('\n'),
+            text: message.value,
             isUser: true,
             timestamp: new Date(),
         });
@@ -73,7 +80,7 @@ const sendMessageToGpt = async () => {
     if (response.success) {
         messageList.value.push({
             name: 'Chat GPT-3',
-            text: [`<span>${response.data}</span>`],
+            text: response.data,
             isUser: false,
             timestamp: new Date(),
         });
@@ -105,11 +112,11 @@ const sendMessageToXcap = async () => {
         import.meta.env.VITE_XCAP_CLOUD_URL +
         '?widgetData=' +
         JSON.stringify(widgetData);
+
+    console.log(url);
     messageList.value.push({
         name: 'XCAP Cloud',
-        text: [
-            `<a class="iw-link" href="${url}" target="_blank">Click here to view the XCAP Cloud</a>`,
-        ],
+        link: url,
         isUser: false,
         timestamp: new Date(),
     });
