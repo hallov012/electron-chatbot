@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, Notification } from 'electron';
+import { app, BrowserWindow, ipcMain, Notification, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import path from 'path';
@@ -59,7 +59,7 @@ function createWindow() {
         log.info('Checking for updates...');
         mainWindow?.webContents.send(
             'updater-message',
-            'Checking for Update...'
+            '업데이트를 확인 중입니다...'
         );
     });
 
@@ -67,20 +67,19 @@ function createWindow() {
         log.info('Update available.');
         mainWindow?.webContents.send(
             'updater-message',
-            'A new update is available. Downloading now...'
+            '업데이트가 발견되었습니다. 다운로드 중...'
         );
     });
 
     autoUpdater.on('update-not-available', () => {
         log.info('Update not available.');
-        // mainWindow?.webContents.send('updater-message', 'Update not available.');
     });
 
     autoUpdater.on('update-downloaded', (event) => {
         log.info('Update downloaded:', event);
         mainWindow?.webContents.send(
             'updater-message',
-            'Update has been downloaded. You can install it now.'
+            '업데이트가 다운로드되었습니다. 설치를 시작합니다.'
         );
     });
 
@@ -94,6 +93,11 @@ function createWindow() {
             title: data.auhtor,
             body: data.message,
         }).show();
+    });
+
+    ipcMain.on('open-external', (event, data) => {
+        console.log('open-external');
+        shell.openExternal(data);
     });
 }
 

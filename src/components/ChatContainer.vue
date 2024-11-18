@@ -14,9 +14,13 @@
                     <div class="iw-text" v-if="message.text">
                         {{ message.text }}
                     </div>
-                    <a class="iw-link" v-if="message.link" :href="message.link"
-                        >Click And Move To XCAP-Cloud</a
+                    <div
+                        class="iw-link"
+                        v-if="message.link"
+                        @click="openLink(message.link)"
                     >
+                        Click And Move To XCAP-Cloud
+                    </div>
                     <div class="iw-timestamp">
                         {{ dateToStamp(message.timestamp) }}
                     </div>
@@ -86,10 +90,7 @@ const sendMessageToGpt = async () => {
             timestamp: new Date(),
         });
 
-        window.electron.ipcRenderer.send('chat-message', {
-            message: response.data,
-            author: 'Chat GPT-3',
-        });
+        alertMessage(response.data, 'Chat GPT-3');
     }
 };
 
@@ -114,19 +115,30 @@ const sendMessageToXcap = async () => {
         '?widgetData=' +
         JSON.stringify(widgetData);
 
-    console.log(url);
-    messageList.value.push({
-        name: 'XCAP Cloud',
-        link: url,
-        isUser: false,
-        timestamp: new Date(),
-    });
+    setTimeout(() => {
+        messageList.value.push({
+            name: 'XCAP Cloud',
+            link: url,
+            isUser: false,
+            timestamp: new Date(),
+        });
+
+        alertMessage('Click And Move To XCAP-Cloud', 'XCAP Cloud');
+    }, 3000);
+};
+
+const alertMessage = (message: string, author: string) => {
+    window.electron.ipcRenderer.send('chat-message', { message, author });
 };
 
 const dateToStamp = (date: Date) => {
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
     return `${hours}:${minutes}`;
+};
+
+const openLink = (link: string) => {
+    window.electron.ipcRenderer.send('open-external', link);
 };
 </script>
 
@@ -169,6 +181,13 @@ const dateToStamp = (date: Date) => {
                     word-wrap: break-word;
                     overflow-wrap: break-word;
                     white-space: pre-wrap;
+                    cursor: pointer;
+                }
+
+                > .iw-link {
+                    color: white;
+                    text-decoration: underline;
+                    cursor: pointer;
                 }
 
                 > .iw-timestamp {

@@ -9,6 +9,7 @@
                 clickable
                 :key="tab.title"
                 class="iw-list-item"
+                active-class="active"
                 @click="currentChat = tab.id"
             >
                 <q-avatar
@@ -87,6 +88,11 @@ onMounted(() => {
             display: flex;
             align-items: center;
             gap: 10px;
+
+            &.active {
+                font-weight: 500;
+                background-color: rgba($primary, 0.1);
+            }
 
             .iw-item-title {
                 font-size: 1em;
